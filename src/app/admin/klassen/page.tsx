@@ -5,34 +5,19 @@ import { AssignStudentForm } from "@/components/admin/AssignStudentForm";
 import { ClassStudentList } from "@/components/admin/ClassStudentList";
 import { DeleteClassButton } from "@/components/admin/DeleteClassButton";
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { getClassesWithStudents, getTeachers, getStudents } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export default async function AdminClassesPage() {
   const session = await requireRole(Role.ADMIN);
-  if (!session) redirect("/login/admin");
+  if (!session) redirect("/");
 
-  const [classes, teachers, students] = await Promise.all([
-    prisma.class.findMany({
-      include: {
-        teacher: true,
-        students: { include: { student: true } },
-        _count: { select: { students: true } },
-      },
-      orderBy: { name: "asc" },
-    }),
-    prisma.user.findMany({
-      where: { role: Role.TEACHER },
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-    }),
-    prisma.user.findMany({
-      where: { role: Role.STUDENT },
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-    }),
-  ]);
+  const classes = getClassesWithStudents();
+  const teachers = getTeachers();
+  const students = getStudents();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-zinc-950">
       <Header
         title="Klassenverwaltung"
         subtitle="Klassen erstellen und Schüler zuweisen"
@@ -46,29 +31,26 @@ export default async function AdminClassesPage() {
       />
 
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Neue Klasse erstellen</h2>
+        <section className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
+          <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neue Klasse erstellen</h2>
           <CreateClassForm teachers={teachers} />
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-slate-900">Alle Klassen</h2>
+          <h2 className="text-lg font-semibold text-zinc-100">Alle Klassen</h2>
           {classes.length === 0 ? (
-            <p className="text-slate-500">Noch keine Klassen vorhanden.</p>
+            <p className="text-zinc-500">Noch keine Klassen vorhanden.</p>
           ) : (
             classes.map((cls) => {
               const assignedIds = new Set(cls.students.map((s) => s.studentId));
               const unassigned = students.filter((s) => !assignedIds.has(s.id));
 
               return (
-                <div
-                  key={cls.id}
-                  className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-                >
+                <div key={cls.id} className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">{cls.name}</h3>
-                      <p className="text-sm text-slate-500">
+                      <h3 className="text-lg font-semibold text-zinc-100">{cls.name}</h3>
+                      <p className="text-sm text-zinc-500">
                         Lehrperson: {cls.teacher.lastName} {cls.teacher.firstName} ·{" "}
                         {cls._count.students} Schüler
                       </p>

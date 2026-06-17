@@ -3,21 +3,17 @@ import { Header } from "@/components/Header";
 import { CreateTeacherForm } from "@/components/admin/CreateTeacherForm";
 import { UserActions } from "@/components/admin/UserActions";
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { getTeachers } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export default async function AdminTeachersPage() {
   const session = await requireRole(Role.ADMIN);
-  if (!session) redirect("/login/admin");
+  if (!session) redirect("/");
 
-  const teachers = await prisma.user.findMany({
-    where: { role: Role.TEACHER },
-    include: { _count: { select: { classes: true } } },
-    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-  });
+  const teachers = getTeachers();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-zinc-950">
       <Header
         title="Lehrpersonen"
         subtitle="Lehrpersonen anlegen, bearbeiten und löschen"
@@ -31,51 +27,39 @@ export default async function AdminTeachersPage() {
       />
 
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">
-            Neue Lehrperson anlegen
-          </h2>
+        <section className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
+          <h2 className="mb-4 text-lg font-semibold text-zinc-100">Neue Lehrperson anlegen</h2>
           <CreateTeacherForm />
         </section>
 
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-lg font-semibold text-slate-900">Alle Lehrpersonen</h2>
+        <section className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
+          <div className="border-b border-zinc-700 px-6 py-4">
+            <h2 className="text-lg font-semibold text-zinc-100">Alle Lehrpersonen</h2>
           </div>
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+          <table className="min-w-full divide-y divide-zinc-700">
+            <thead className="bg-zinc-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                  E-Mail
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                  Klassen
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                  Aktionen
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">E-Mail</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Klassen</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Aktionen</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-zinc-800">
               {teachers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-zinc-500">
                     Noch keine Lehrpersonen erfasst.
                   </td>
                 </tr>
               ) : (
                 teachers.map((teacher) => (
                   <tr key={teacher.id}>
-                    <td className="px-6 py-4 font-medium text-slate-900">
+                    <td className="px-6 py-4 font-medium text-zinc-100">
                       {teacher.lastName} {teacher.firstName}
                     </td>
-                    <td className="px-6 py-4 text-slate-600">{teacher.email}</td>
-                    <td className="px-6 py-4 text-slate-600">
-                      {teacher._count.classes}
-                    </td>
+                    <td className="px-6 py-4 text-zinc-400">{teacher.email}</td>
+                    <td className="px-6 py-4 text-zinc-400">{teacher.classCount}</td>
                     <td className="px-6 py-4">
                       <UserActions
                         id={teacher.id}

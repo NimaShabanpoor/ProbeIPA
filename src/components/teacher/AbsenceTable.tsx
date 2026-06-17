@@ -26,11 +26,7 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
   const [excuseId, setExcuseId] = useState<string | null>(null);
   const [excuseNote, setExcuseNote] = useState("");
 
-  async function updateAbsence(
-    studentId: string,
-    status: string,
-    note?: string
-  ) {
+  async function updateAbsence(studentId: string, status: string, note?: string) {
     setLoadingId(studentId);
     await fetch(`/api/teacher/classes/${classId}/absences`, {
       method: "POST",
@@ -52,8 +48,8 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
     <div className="space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Absenzen erfassen</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="text-lg font-semibold text-zinc-100">Absenzen erfassen</h2>
+          <p className="text-sm text-zinc-500">
             Absenzen können entschuldigt oder abgeschlossen werden.
           </p>
         </div>
@@ -61,32 +57,32 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
           type="date"
           value={date}
           onChange={(e) => handleDateChange(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-blue-500 focus:ring-2"
+          className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
+      <div className="overflow-hidden rounded-xl border border-zinc-700">
+        <table className="min-w-full divide-y divide-zinc-700">
+          <thead className="bg-zinc-800/50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 Schüler/in
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 Erfassen
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 Bearbeiten
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-zinc-800">
             {students.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={4} className="px-4 py-8 text-center text-zinc-500">
                   Noch keine Schüler in dieser Klasse.
                 </td>
               </tr>
@@ -100,13 +96,11 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                 return (
                   <tr key={student.id}>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-zinc-100">
                         {student.lastName} {student.firstName}
                       </p>
                       {current?.note && (
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          Notiz: {current.note}
-                        </p>
+                        <p className="mt-0.5 text-xs text-zinc-500">Notiz: {current.note}</p>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -126,8 +120,8 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                             onClick={() => updateAbsence(student.id, status)}
                             className={`rounded-md px-2 py-1 text-xs font-medium transition ${
                               currentStatus === status
-                                ? "bg-blue-600 text-white"
-                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                ? "bg-zinc-300 text-zinc-900"
+                                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
                             }`}
                           >
                             {absenceStatusLabel(status)}
@@ -145,15 +139,13 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                                 value={excuseNote}
                                 onChange={(e) => setExcuseNote(e.target.value)}
                                 placeholder="Grund der Entschuldigung"
-                                className="rounded-md border border-slate-300 px-2 py-1 text-xs outline-none ring-amber-500 focus:ring-2"
+                                className="rounded-md border border-zinc-600 bg-zinc-900 px-2 py-1 text-xs text-zinc-100 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                               />
                               <button
                                 type="button"
                                 disabled={isLoading}
-                                onClick={() =>
-                                  updateAbsence(student.id, "EXCUSED", excuseNote)
-                                }
-                                className="rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white hover:bg-amber-600"
+                                onClick={() => updateAbsence(student.id, "EXCUSED", excuseNote)}
+                                className="rounded-md bg-amber-600 px-2 py-1 text-xs font-medium text-white hover:bg-amber-500"
                               >
                                 Speichern
                               </button>
@@ -164,7 +156,7 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => setExcuseId(student.id)}
-                                className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 hover:bg-amber-200"
+                                className="rounded-md border border-amber-800 bg-amber-950/50 px-2 py-1 text-xs font-medium text-amber-300 hover:bg-amber-900/50"
                               >
                                 Entschuldigen
                               </button>
@@ -172,7 +164,7 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => updateAbsence(student.id, "CLOSED")}
-                                className="rounded-md bg-slate-700 px-2 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                                className="rounded-md bg-zinc-600 px-2 py-1 text-xs font-medium text-zinc-100 hover:bg-zinc-500"
                               >
                                 Abschliessen
                               </button>
@@ -184,12 +176,12 @@ export function AbsenceTable({ classId, students, initialDate }: AbsenceTablePro
                           type="button"
                           disabled={isLoading}
                           onClick={() => updateAbsence(student.id, "CLOSED")}
-                          className="rounded-md bg-slate-700 px-2 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                          className="rounded-md bg-zinc-600 px-2 py-1 text-xs font-medium text-zinc-100 hover:bg-zinc-500"
                         >
                           Abschliessen
                         </button>
                       ) : (
-                        <span className="text-xs text-slate-400">—</span>
+                        <span className="text-xs text-zinc-600">—</span>
                       )}
                     </td>
                   </tr>

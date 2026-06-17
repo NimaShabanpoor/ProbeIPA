@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/client";
+import { getStudentMemberships, getStudentAbsences, getStudentAbsenceStats } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export async function GET() {
   const session = await requireRole(Role.STUDENT);
@@ -9,26 +9,24 @@ export async function GET() {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
   }
 
-  const [memberships, absences, stats] = await Promise.all([
-    prisma.classStudent.findMany({
-      where: { studentId: session.id },
-      include: { class: { include: { teacher: true } } },
-    }),
-    prisma.absence.findMany({
-      where: {
-        studentId: session.id,
-        status: { not: "PRESENT" },
-      },
-      include: { class: true },
-      orderBy: { date: "desc" },
-      take: 50,
-    }),
-    prisma.absence.groupBy({
-      by: ["status"],
-      where: { studentId: session.id },
-      _count: true,
-    }),
-  ]);
+  const memberships = getStudentMemberships(session.id).map((m) => ({
+    id: m.id,
+    class: {
+      id: m.classId,
+      name: m.className,
+      teacher: { firstName: m.teacherFirstName, lastName: m.teacherLastName },
+    },
+  }));
+
+  const absences = getStudentAbsences(session.id, 50).map((a) => ({
+    ...a,
+    class: { name: a.className },
+  }));
+
+  const stats = getStudentAbsenceStats(session.id).map((s) => ({
+    status: s.status,
+    _count: s.count,
+  }));
 
   return NextResponse.json({ memberships, absences, stats });
 }

@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { Role } from "@/generated/prisma/client";
+import { Role } from "@/lib/types";
 
 export const SESSION_COOKIE = "absenzen-session";
 
@@ -75,10 +75,8 @@ export async function requireRole(role: Role) {
   return session;
 }
 
-export async function requireOneOfRoles(...roles: Role[]) {
-  const session = await getSession();
-  if (!session || !roles.includes(session.role)) {
-    return null;
-  }
-  return session;
+export function dashboardForRole(role: Role) {
+  if (role === Role.ADMIN) return "/admin";
+  if (role === Role.TEACHER) return "/lehrer";
+  return "/schueler";
 }

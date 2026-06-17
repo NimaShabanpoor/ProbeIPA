@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Role } from "@/lib/types";
 
-interface LoginFormProps {
-  role: "ADMIN" | "TEACHER" | "STUDENT";
-  title: string;
-  redirectTo: string;
-}
+const redirects: Record<Role, string> = {
+  [Role.ADMIN]: "/admin",
+  [Role.TEACHER]: "/lehrer",
+  [Role.STUDENT]: "/schueler",
+};
 
-export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
+export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +26,7 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -34,7 +35,7 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
         return;
       }
 
-      router.push(redirectTo);
+      router.push(redirects[data.user.role as Role]);
       router.refresh();
     } catch {
       setError("Verbindungsfehler. Bitte erneut versuchen.");
@@ -45,21 +46,14 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Melden Sie sich mit Ihren Zugangsdaten an.
-        </p>
-      </div>
-
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-red-800 bg-red-950/50 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-zinc-300">
           E-Mail
         </label>
         <input
@@ -68,13 +62,13 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2.5 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
           placeholder="name@schule.ch"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">
+        <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-zinc-300">
           Passwort
         </label>
         <input
@@ -83,7 +77,7 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none ring-blue-500 focus:ring-2"
+          className="w-full rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2.5 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
           placeholder="••••••••"
         />
       </div>
@@ -91,7 +85,7 @@ export function LoginForm({ role, title, redirectTo }: LoginFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:opacity-60"
+        className="w-full rounded-lg bg-gradient-to-r from-zinc-300 to-zinc-400 px-4 py-2.5 font-semibold text-zinc-900 transition hover:from-zinc-200 hover:to-zinc-300 disabled:opacity-60"
       >
         {loading ? "Wird angemeldet..." : "Anmelden"}
       </button>

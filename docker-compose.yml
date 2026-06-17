@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      JWT_SECRET: demo-secret-fuer-lokale-entwicklung
+      DATABASE_PATH: /data/app.db
+    volumes:
+      - sqlite-data:/data
+
+volumes:
+  sqlite-data:

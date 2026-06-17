@@ -44,11 +44,11 @@ export function DeleteClassButton({ classId, className }: DeleteClassButtonProps
         type="button"
         disabled={loading}
         onClick={handleDelete}
-        className="rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+        className="rounded-lg border border-red-800 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-950 disabled:opacity-60"
       >
         {loading ? "Wird gelöscht..." : "Klasse löschen"}
       </button>
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>
   );
 }

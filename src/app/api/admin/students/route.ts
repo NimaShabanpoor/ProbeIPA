@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/client";
+import { createUser, getStudents, getUserByEmail } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export async function GET() {
   const session = await requireRole(Role.ADMIN);
@@ -10,15 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
   }
 
-  const students = await prisma.user.findMany({
-    where: { role: Role.STUDENT },
-    include: {
-      classMemberships: { include: { class: true } },
-    },
-    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-  });
-
-  return NextResponse.json({ students });
+  return NextResponse.json({ students: getStudents() });
 }
 
 export async function POST(request: NextRequest) {
@@ -36,39 +28,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const existing = await prisma.user.findUnique({
-    where: { email: email.toLowerCase().trim() },
-  });
-  if (existing) {
-    return NextResponse.json(
-      { error: "E-Mail wird bereits verwendet" },
-      { status: 409 }
-    );
+  if (getUserByEmail(email)) {
+    return NextResponse.json({ error: "E-Mail wird bereits verwendet" }, { status: 409 });
   }
 
   const hashed = await bcrypt.hash(password, 10);
-  const student = await prisma.user.create({
-    data: {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.toLowerCase().trim(),
-      password: hashed,
-      role: Role.STUDENT,
-      ...(classId
-        ? { classMemberships: { create: { classId } } }
-        : {}),
-    },
+  const student = createUser({
+    firstName,
+    lastName,
+    email,
+    password: hashed,
+    role: Role.STUDENT,
+    classId,
   });
 
-  return NextResponse.json(
-    {
-      student: {
-        id: student.id,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        email: student.email,
-      },
-    },
-    { status: 201 }
-  );
+  return NextResponse.json({ student }, { status: 201 });
 }

@@ -30,7 +30,7 @@ export function AssignStudentForm({ classId, students }: AssignStudentFormProps)
 
   if (students.length === 0) {
     return (
-      <p className="mt-3 text-sm text-slate-500">Alle Schüler sind dieser Klasse zugewiesen.</p>
+      <p className="mt-3 text-sm text-zinc-500">Alle Schüler sind dieser Klasse zugewiesen.</p>
     );
   }
 
@@ -39,7 +39,7 @@ export function AssignStudentForm({ classId, students }: AssignStudentFormProps)
       <select
         value={studentId}
         onChange={(e) => setStudentId(e.target.value)}
-        className="flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none ring-violet-500 focus:ring-2"
+        className="flex-1 rounded-lg border border-zinc-600 bg-zinc-900 px-2 py-1.5 text-sm text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
       >
         {students.map((s) => (
           <option key={s.id} value={s.id}>
@@ -50,7 +50,7 @@ export function AssignStudentForm({ classId, students }: AssignStudentFormProps)
       <button
         type="submit"
         disabled={loading}
-        className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+        className="rounded-lg bg-zinc-300 px-3 py-1.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-200 disabled:opacity-60"
       >
         {loading ? "..." : "Zuweisen"}
       </button>

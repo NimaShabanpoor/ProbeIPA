@@ -31,7 +31,7 @@ export function ClassStudentList({ classId, students }: ClassStudentListProps) {
   }
 
   if (students.length === 0) {
-    return <p className="mt-4 text-sm text-slate-500">Noch keine Schüler in dieser Klasse.</p>;
+    return <p className="mt-4 text-sm text-zinc-500">Noch keine Schüler in dieser Klasse.</p>;
   }
 
   return (
@@ -39,7 +39,7 @@ export function ClassStudentList({ classId, students }: ClassStudentListProps) {
       {students.map((entry) => (
         <li
           key={entry.membershipId}
-          className="inline-flex items-center gap-1 rounded-full bg-slate-100 pl-3 pr-1 py-1 text-sm text-slate-700"
+          className="inline-flex items-center gap-1 rounded-full border border-zinc-600 bg-zinc-800 pl-3 pr-1 py-1 text-sm text-zinc-300"
         >
           <span>
             {entry.lastName} {entry.firstName}
@@ -53,7 +53,7 @@ export function ClassStudentList({ classId, students }: ClassStudentListProps) {
                 `${entry.firstName} ${entry.lastName}`
               )
             }
-            className="rounded-full px-2 py-0.5 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-60"
+            className="rounded-full px-2 py-0.5 text-xs font-medium text-red-400 hover:bg-red-950 disabled:opacity-60"
             title="Aus Klasse entfernen"
           >
             ×

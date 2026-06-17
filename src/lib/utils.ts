@@ -24,11 +24,11 @@ export function absenceStatusLabel(status: string) {
 
 export function absenceStatusColor(status: string) {
   const colors: Record<string, string> = {
-    PRESENT: "bg-emerald-100 text-emerald-800",
-    ABSENT: "bg-red-100 text-red-800",
-    EXCUSED: "bg-amber-100 text-amber-800",
-    LATE: "bg-orange-100 text-orange-800",
-    CLOSED: "bg-slate-200 text-slate-700",
+    PRESENT: "bg-emerald-900/50 text-emerald-300 border border-emerald-800",
+    ABSENT: "bg-red-900/50 text-red-300 border border-red-800",
+    EXCUSED: "bg-amber-900/50 text-amber-300 border border-amber-800",
+    LATE: "bg-orange-900/50 text-orange-300 border border-orange-800",
+    CLOSED: "bg-zinc-800 text-zinc-400 border border-zinc-700",
   };
-  return colors[status] ?? "bg-slate-100 text-slate-800";
+  return colors[status] ?? "bg-zinc-800 text-zinc-400";
 }

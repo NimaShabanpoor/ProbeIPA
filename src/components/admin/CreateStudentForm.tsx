@@ -59,7 +59,7 @@ export function CreateStudentForm({ classes }: CreateStudentFormProps) {
         required
         value={form.firstName}
         onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-        className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-violet-500 focus:ring-2"
+        className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
       />
       <input
         type="text"
@@ -67,7 +67,7 @@ export function CreateStudentForm({ classes }: CreateStudentFormProps) {
         required
         value={form.lastName}
         onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-        className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-violet-500 focus:ring-2"
+        className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
       />
       <input
         type="email"
@@ -75,7 +75,7 @@ export function CreateStudentForm({ classes }: CreateStudentFormProps) {
         required
         value={form.email}
         onChange={(e) => setForm({ ...form, email: e.target.value })}
-        className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-violet-500 focus:ring-2"
+        className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
       />
       <input
         type="text"
@@ -83,12 +83,12 @@ export function CreateStudentForm({ classes }: CreateStudentFormProps) {
         required
         value={form.password}
         onChange={(e) => setForm({ ...form, password: e.target.value })}
-        className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-violet-500 focus:ring-2"
+        className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
       />
       <select
         value={form.classId}
         onChange={(e) => setForm({ ...form, classId: e.target.value })}
-        className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-violet-500 focus:ring-2 md:col-span-2"
+        className="rounded-lg border border-zinc-600 bg-zinc-900 px-3 py-2 text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 md:col-span-2"
       >
         <option value="">Keine Klasse zuweisen</option>
         {classes.map((c) => (
@@ -101,12 +101,12 @@ export function CreateStudentForm({ classes }: CreateStudentFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+          className="rounded-lg bg-zinc-300 px-4 py-2 font-semibold text-zinc-900 hover:bg-zinc-200 disabled:opacity-60"
         >
           {loading ? "Wird erstellt..." : "Schüler anlegen"}
         </button>
-        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-        {success && <p className="mt-2 text-sm text-emerald-600">{success}</p>}
+        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+        {success && <p className="mt-2 text-sm text-emerald-400">{success}</p>}
       </div>
     </form>
   );

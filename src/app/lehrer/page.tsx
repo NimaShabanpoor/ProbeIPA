@@ -2,29 +2,18 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { Role } from "@/generated/prisma/client";
+import { getTeacherClasses, countOpenAbsences } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export default async function TeacherDashboardPage() {
   const session = await requireRole(Role.TEACHER);
-  if (!session) redirect("/login/lehrer");
+  if (!session) redirect("/");
 
-  const [classes, openAbsences] = await Promise.all([
-    prisma.class.findMany({
-      where: { teacherId: session.id },
-      include: { _count: { select: { students: true } } },
-      orderBy: { name: "asc" },
-    }),
-    prisma.absence.count({
-      where: {
-        class: { teacherId: session.id },
-        status: { in: ["ABSENT", "LATE", "EXCUSED"] },
-      },
-    }),
-  ]);
+  const classes = getTeacherClasses(session.id);
+  const openAbsences = countOpenAbsences(session.id);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-zinc-950">
       <Header
         title="Lehrer-Dashboard"
         subtitle="Absenzen erfassen und bearbeiten"
@@ -34,17 +23,17 @@ export default async function TeacherDashboardPage() {
 
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
         <section className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Meine Klassen</p>
-            <p className="mt-1 text-3xl font-bold text-slate-900">{classes.length}</p>
+          <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">Meine Klassen</p>
+            <p className="mt-1 text-3xl font-bold text-zinc-200">{classes.length}</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Offene Absenzen</p>
-            <p className="mt-1 text-3xl font-bold text-amber-600">{openAbsences}</p>
+          <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">Offene Absenzen</p>
+            <p className="mt-1 text-3xl font-bold text-amber-400">{openAbsences}</p>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Heute</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">
+          <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
+            <p className="text-sm text-zinc-500">Heute</p>
+            <p className="mt-1 text-lg font-semibold text-zinc-200">
               {new Intl.DateTimeFormat("de-CH", {
                 weekday: "long",
                 day: "numeric",
@@ -54,12 +43,11 @@ export default async function TeacherDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Meine Klassen</h2>
+        <section className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
+          <h2 className="mb-4 text-lg font-semibold text-zinc-100">Meine Klassen</h2>
           {classes.length === 0 ? (
-            <p className="text-slate-500">
-              Ihnen wurden noch keine Klassen zugewiesen. Bitte wenden Sie sich an den
-              Administrator.
+            <p className="text-zinc-500">
+              Ihnen wurden noch keine Klassen zugewiesen. Bitte wenden Sie sich an den Administrator.
             </p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
@@ -67,13 +55,11 @@ export default async function TeacherDashboardPage() {
                 <Link
                   key={cls.id}
                   href={`/lehrer/klassen/${cls.id}`}
-                  className="rounded-xl border border-slate-200 p-5 transition hover:border-blue-300 hover:bg-blue-50/40"
+                  className="rounded-xl border border-zinc-700 p-5 transition hover:border-zinc-500 hover:bg-zinc-800"
                 >
-                  <h3 className="text-lg font-semibold text-slate-900">{cls.name}</h3>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {cls._count.students} Schüler
-                  </p>
-                  <span className="mt-4 inline-block text-sm font-medium text-blue-600">
+                  <h3 className="text-lg font-semibold text-zinc-100">{cls.name}</h3>
+                  <p className="mt-1 text-sm text-zinc-500">{cls.studentCount} Schüler</p>
+                  <span className="mt-4 inline-block text-sm font-medium text-zinc-400">
                     Absenzen erfassen →
                   </span>
                 </Link>

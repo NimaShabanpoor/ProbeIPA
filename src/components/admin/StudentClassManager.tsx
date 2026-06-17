@@ -77,14 +77,14 @@ export function StudentClassManager({
           {assignedClasses.map((cls) => (
             <li
               key={cls.id}
-              className="inline-flex items-center gap-1 rounded-full bg-violet-100 pl-3 pr-1 py-1 text-sm text-violet-800"
+              className="inline-flex items-center gap-1 rounded-full border border-zinc-600 bg-zinc-800 pl-3 pr-1 py-1 text-sm text-zinc-300"
             >
               <span>{cls.name}</span>
               <button
                 type="button"
                 disabled={loading}
                 onClick={() => handleRemove(cls.id, cls.name)}
-                className="rounded-full px-2 py-0.5 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-60"
+                className="rounded-full px-2 py-0.5 text-xs font-medium text-red-400 hover:bg-red-950 disabled:opacity-60"
                 title="Aus Klasse entfernen"
               >
                 ×
@@ -93,7 +93,7 @@ export function StudentClassManager({
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-slate-500">Keiner Klasse zugewiesen.</p>
+        <p className="text-sm text-zinc-500">Keiner Klasse zugewiesen.</p>
       )}
 
       {availableClasses.length > 0 && (
@@ -101,7 +101,7 @@ export function StudentClassManager({
           <select
             value={classId}
             onChange={(e) => setClassId(e.target.value)}
-            className="min-w-[180px] flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm outline-none ring-violet-500 focus:ring-2"
+            className="min-w-[180px] flex-1 rounded-lg border border-zinc-600 bg-zinc-900 px-2 py-1.5 text-sm text-zinc-100 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
           >
             <option value="">Klasse hinzufügen...</option>
             {availableClasses.map((c) => (
@@ -113,14 +113,14 @@ export function StudentClassManager({
           <button
             type="submit"
             disabled={loading || !classId}
-            className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+            className="rounded-lg bg-zinc-300 px-3 py-1.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-200 disabled:opacity-60"
           >
             {loading ? "..." : "Zuweisen"}
           </button>
         </form>
       )}
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
 }

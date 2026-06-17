@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/client";
+import { getTeacherClasses } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 export async function GET() {
   const session = await requireRole(Role.TEACHER);
@@ -9,13 +9,10 @@ export async function GET() {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
   }
 
-  const classes = await prisma.class.findMany({
-    where: { teacherId: session.id },
-    include: {
-      _count: { select: { students: true, absences: true } },
-    },
-    orderBy: { name: "asc" },
-  });
+  const classes = getTeacherClasses(session.id).map((c) => ({
+    ...c,
+    _count: { students: c.studentCount },
+  }));
 
   return NextResponse.json({ classes });
 }

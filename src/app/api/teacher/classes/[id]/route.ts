@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
-import { AbsenceStatus, Role } from "@/generated/prisma/client";
+import { assignStudentToClass, getClassForTeacher, getUserById } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -12,20 +12,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const classData = await prisma.class.findFirst({
-    where: { id, teacherId: session.id },
-    include: {
-      students: {
-        include: {
-          student: true,
-        },
-        orderBy: {
-          student: { lastName: "asc" },
-        },
-      },
-    },
-  });
-
+  const classData = getClassForTeacher(id, session.id);
   if (!classData) {
     return NextResponse.json({ error: "Klasse nicht gefunden" }, { status: 404 });
   }
@@ -42,27 +29,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const { studentId } = await request.json();
 
-  const classData = await prisma.class.findFirst({
-    where: { id, teacherId: session.id },
-  });
-  if (!classData) {
+  if (!getClassForTeacher(id, session.id)) {
     return NextResponse.json({ error: "Klasse nicht gefunden" }, { status: 404 });
   }
 
-  const student = await prisma.user.findFirst({
-    where: { id: studentId, role: Role.STUDENT },
-  });
-  if (!student) {
+  if (!getUserById(studentId, Role.STUDENT)) {
     return NextResponse.json({ error: "Schüler nicht gefunden" }, { status: 404 });
   }
 
-  await prisma.classStudent.upsert({
-    where: {
-      classId_studentId: { classId: id, studentId },
-    },
-    create: { classId: id, studentId },
-    update: {},
-  });
-
+  assignStudentToClass(id, studentId);
   return NextResponse.json({ success: true });
 }

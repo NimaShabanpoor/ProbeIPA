@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/auth";
-import { Role } from "@/generated/prisma/client";
+import { getUserByEmail, getUserById, updateUser, deleteUser, getTeacherClassCount } from "@/lib/db";
+import { Role } from "@/lib/types";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -15,9 +15,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const { id } = await context.params;
   const { firstName, lastName, email, password } = await request.json();
 
-  const teacher = await prisma.user.findFirst({
-    where: { id, role: Role.TEACHER },
-  });
+  const teacher = getUserById(id, Role.TEACHER);
   if (!teacher) {
     return NextResponse.json({ error: "Lehrperson nicht gefunden" }, { status: 404 });
   }
@@ -30,37 +28,19 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   }
 
   const normalizedEmail = email.toLowerCase().trim();
-  if (normalizedEmail !== teacher.email) {
-    const existing = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-    });
-    if (existing) {
-      return NextResponse.json(
-        { error: "E-Mail wird bereits verwendet" },
-        { status: 409 }
-      );
-    }
+  if (normalizedEmail !== teacher.email && getUserByEmail(normalizedEmail)) {
+    return NextResponse.json({ error: "E-Mail wird bereits verwendet" }, { status: 409 });
   }
 
-  const updated = await prisma.user.update({
-    where: { id },
-    data: {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: normalizedEmail,
-      ...(password?.trim()
-        ? { password: await bcrypt.hash(password, 10) }
-        : {}),
-    },
+  const updated = updateUser(id, {
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
+    email: normalizedEmail,
+    ...(password?.trim() ? { password: await bcrypt.hash(password, 10) } : {}),
   });
 
   return NextResponse.json({
-    teacher: {
-      id: updated.id,
-      firstName: updated.firstName,
-      lastName: updated.lastName,
-      email: updated.email,
-    },
+    teacher: { id: updated.id, firstName: updated.firstName, lastName: updated.lastName, email: updated.email },
   });
 }
 
@@ -71,25 +51,18 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
   }
 
   const { id } = await context.params;
-
-  const teacher = await prisma.user.findFirst({
-    where: { id, role: Role.TEACHER },
-    include: { _count: { select: { classes: true } } },
-  });
+  const teacher = getUserById(id, Role.TEACHER);
   if (!teacher) {
     return NextResponse.json({ error: "Lehrperson nicht gefunden" }, { status: 404 });
   }
 
-  if (teacher._count.classes > 0) {
+  if (getTeacherClassCount(id) > 0) {
     return NextResponse.json(
-      {
-        error:
-          "Lehrperson kann nicht gelöscht werden, solange noch Klassen zugewiesen sind.",
-      },
+      { error: "Lehrperson kann nicht gelöscht werden, solange noch Klassen zugewiesen sind." },
       { status: 409 }
     );
   }
 
-  await prisma.user.delete({ where: { id } });
+  deleteUser(id);
   return NextResponse.json({ success: true });
 }

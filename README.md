@@ -2,48 +2,56 @@
 
 Web-App zur digitalen Verwaltung von Schülerabsenzen mit drei Rollen: **Admin**, **Lehrperson** und **Schüler**.
 
-## Funktionen
-
-### Admin-Dashboard
-- Lehrpersonen anlegen (eigene Logins)
-- Schüler anlegen und Klassen zuweisen
-- Klassen erstellen und Lehrpersonen zuweisen
-
-### Lehrer-Dashboard
-- Nur die eigenen zugewiesenen Klassen sehen
-- Absenzen erfassen (Anwesend, Abwesend, Verspätet)
-- Absenzen **entschuldigen** (mit Begründung)
-- Absenzen **abschliessen**
-
-### Schüler-Dashboard
-- Eigene Klassen und Absenzen einsehen
-
-## Schnellstart
+## Schnellstart mit Docker Desktop
 
 ```bash
-npm install
-npm run db:setup
-npm run dev
+docker compose up --build
 ```
 
 Die App läuft unter [http://localhost:3000](http://localhost:3000).
 
-## Demo-Zugänge
+Beim ersten Start werden automatisch Demo-Daten erstellt.
+
+## Lokale Entwicklung (ohne Docker)
+
+```bash
+npm install
+```
+
+Erstelle eine `.env` Datei:
+
+```env
+JWT_SECRET=dein-geheimer-schluessel
+DATABASE_PATH=./data/app.db
+```
+
+```bash
+npm run dev
+```
+
+## Anmeldung
+
+Ein einziges Login für alle Rollen — die Rolle wird automatisch erkannt:
 
 | Rolle   | E-Mail             | Passwort |
 |---------|--------------------|----------|
 | Admin   | admin@schule.ch    | demo123  |
 | Lehrer  | mueller@schule.ch  | demo123  |
-| Lehrer  | meier@schule.ch    | demo123  |
 | Schüler | lukas@schule.ch    | demo123  |
-| Schüler | sara@schule.ch     | demo123  |
 
-## Rollen-Workflow
+## Architektur (einfach erklärt)
 
-1. **Admin** legt Lehrpersonen, Schüler und Klassen an
-2. **Lehrperson** erfasst und bearbeitet Absenzen in den zugewiesenen Klassen
-3. **Schüler** sehen ihre eigenen Absenzen
+```
+Login (/) → JWT-Cookie → Dashboard je nach Rolle
+                ↓
+         SQLite-Datenbank (better-sqlite3)
+```
+
+- **`src/lib/db.ts`** — Datenbank-Verbindung und alle SQL-Abfragen
+- **`src/lib/auth.ts`** — Login-Session mit JWT-Cookie
+- **`src/app/api/`** — REST-API für Formulare
+- **`src/app/`** — Seiten (Server Components laden Daten direkt aus der DB)
 
 ## Technologie
 
-- Next.js 16, Prisma 7, SQLite, JWT-Auth, Tailwind CSS
+- Next.js 16, SQLite (better-sqlite3), JWT-Auth, Tailwind CSS, Docker

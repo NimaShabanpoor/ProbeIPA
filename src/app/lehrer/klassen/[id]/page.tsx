@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { AbsenceTable } from "@/components/teacher/AbsenceTable";
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getClassForTeacher } from "@/lib/db";
 import { formatDateInput } from "@/lib/utils";
-import { Role } from "@/generated/prisma/client";
+import { Role } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -14,37 +14,15 @@ type PageProps = {
 
 export default async function ClassDetailPage({ params, searchParams }: PageProps) {
   const session = await requireRole(Role.TEACHER);
-  if (!session) redirect("/login/lehrer");
+  if (!session) redirect("/");
 
   const { id } = await params;
   const { date: dateParam } = await searchParams;
 
   const date = dateParam ? new Date(dateParam) : new Date();
   date.setHours(0, 0, 0, 0);
-  const nextDay = new Date(date);
-  nextDay.setDate(nextDay.getDate() + 1);
 
-  const classData = await prisma.class.findFirst({
-    where: { id, teacherId: session.id },
-    include: {
-      students: {
-        include: {
-          student: {
-            include: {
-              absences: {
-                where: {
-                  classId: id,
-                  date: { gte: date, lt: nextDay },
-                },
-              },
-            },
-          },
-        },
-        orderBy: { student: { lastName: "asc" } },
-      },
-    },
-  });
-
+  const classData = getClassForTeacher(id, session.id, date);
   if (!classData) redirect("/lehrer");
 
   const students = classData.students.map((entry) => ({
@@ -55,7 +33,7 @@ export default async function ClassDetailPage({ params, searchParams }: PageProp
   }));
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-zinc-950">
       <Header
         title={classData.name}
         subtitle="Tägliche Absenzen erfassen"
@@ -64,11 +42,11 @@ export default async function ClassDetailPage({ params, searchParams }: PageProp
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-        <Link href="/lehrer" className="text-sm font-medium text-blue-600 hover:underline">
+        <Link href="/lehrer" className="text-sm font-medium text-zinc-400 hover:text-zinc-200">
           ← Zurück zur Übersicht
         </Link>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
           <AbsenceTable
             classId={classData.id}
             students={students}
