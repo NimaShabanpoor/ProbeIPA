@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { requireRole } from "@/lib/auth";
 import { getStudentMemberships, getStudentAbsences, getStudentAbsenceStats } from "@/lib/db";
-import { absenceStatusColor, absenceStatusLabel, formatDate } from "@/lib/utils";
+import { absenceStatusColor, absenceStatusLabel, absenceReasonLabel, formatDate } from "@/lib/utils";
 import { Role } from "@/lib/types";
 
 export default async function StudentDashboardPage() {
@@ -34,8 +34,8 @@ export default async function StudentDashboardPage() {
             <p className="mt-1 text-3xl font-bold text-amber-400">{statMap.EXCUSED ?? 0}</p>
           </div>
           <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
-            <p className="text-sm text-zinc-500">Verspätet</p>
-            <p className="mt-1 text-3xl font-bold text-orange-400">{statMap.LATE ?? 0}</p>
+            <p className="text-sm text-zinc-500">Unentschuldigt</p>
+            <p className="mt-1 text-3xl font-bold text-red-400">{statMap.UNEXCUSED ?? 0}</p>
           </div>
         </section>
 
@@ -86,6 +86,7 @@ export default async function StudentDashboardPage() {
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${absenceStatusColor(absence.status)}`}
                       >
                         {absenceStatusLabel(absence.status)}
+                        {absence.note ? ` · ${absenceReasonLabel(absence.note)}` : ""}
                       </span>
                     </td>
                   </tr>

@@ -37,6 +37,7 @@ export default async function AdminDashboardPage() {
         userName={`${session.firstName} ${session.lastName}`}
         nav={[
           { href: "/admin", label: "Übersicht" },
+          { href: "/admin/absenzen", label: "Absenzen" },
           { href: "/admin/lehrer", label: "Lehrpersonen" },
           { href: "/admin/schueler", label: "Schüler" },
           { href: "/admin/klassen", label: "Klassen" },

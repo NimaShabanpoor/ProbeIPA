@@ -116,8 +116,8 @@ function seedIfEmpty() {
     }
 
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.ABSENT, null, classAId, studentIds[0]);
-    insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "Arzttermin", classAId, studentIds[1]);
-    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.LATE, null, classAId, studentIds[2]);
+    insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, null, classAId, studentIds[1]);
+    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.UNEXCUSED, "VERSPAETET", classAId, studentIds[2]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[4]);
   })();
 }
@@ -434,8 +434,46 @@ export function getStudentAbsences(studentId: string, limit = 30) {
     id: string;
     date: string;
     status: string;
+    note: string | null;
     className: string;
   }[];
+}
+
+export function getAdminAbsences() {
+  return getDb()
+    .prepare(
+      `SELECT a.id, a.date, a.status, a.note,
+        u.id as studentId, u.firstName as studentFirstName, u.lastName as studentLastName,
+        c.name as className
+       FROM Absence a
+       JOIN User u ON u.id = a.studentId
+       JOIN Class c ON c.id = a.classId
+       WHERE a.status IN ('ABSENT', 'EXCUSED', 'UNEXCUSED')
+       ORDER BY a.date DESC, u.lastName, u.firstName`
+    )
+    .all() as {
+    id: string;
+    date: string;
+    status: string;
+    note: string | null;
+    studentId: string;
+    studentFirstName: string;
+    studentLastName: string;
+    className: string;
+  }[];
+}
+
+export function getAbsenceById(id: string) {
+  return getDb()
+    .prepare("SELECT * FROM Absence WHERE id = ?")
+    .get(id) as
+    | { id: string; date: string; status: string; note: string | null; classId: string; studentId: string }
+    | undefined;
+}
+
+export function updateAbsenceByAdmin(id: string, status: string, note: string | null) {
+  getDb().prepare("UPDATE Absence SET status = ?, note = ? WHERE id = ?").run(status, note, id);
+  return getAbsenceById(id);
 }
 
 export function getStudentAbsenceStats(studentId: string) {
