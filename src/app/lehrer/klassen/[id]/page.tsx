@@ -36,14 +36,14 @@ export default async function ClassDetailPage({ params, searchParams }: PageProp
     <div className="min-h-screen bg-zinc-950">
       <Header
         title={classData.name}
-        subtitle="Tägliche Absenzen erfassen"
+        subtitle="Anwesenheit erfassen"
         userName={`${session.firstName} ${session.lastName}`}
-        nav={[{ href: "/lehrer", label: "Übersicht" }]}
+        nav={[{ href: "/lehrer", label: "Klassen" }]}
       />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <main className="mx-auto max-w-4xl space-y-6 px-4 py-8">
         <Link href="/lehrer" className="text-sm font-medium text-zinc-400 hover:text-zinc-200">
-          ← Zurück zur Übersicht
+          ← Zurück zu Klassen
         </Link>
 
         <section className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">

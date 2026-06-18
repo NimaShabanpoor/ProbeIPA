@@ -37,7 +37,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Klasse nicht gefunden" }, { status: 404 });
   }
 
-  const validStatuses = Object.values(AbsenceStatus);
+  const validStatuses = [AbsenceStatus.PRESENT, AbsenceStatus.ABSENT];
   if (!validStatuses.includes(status)) {
     return NextResponse.json({ error: "Ungültiger Status" }, { status: 400 });
   }
