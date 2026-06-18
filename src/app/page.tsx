@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/LoginForm";
 import { dashboardForRole, getSession } from "@/lib/auth";
 import { DEMO_PASSWORD } from "@/lib/demo";
+
+// Startseite: Login. Bereits eingeloggte User werden zum Dashboard weitergeleitet.
 export default async function HomePage() {
   const session = await getSession();
   if (session) redirect(dashboardForRole(session.role));

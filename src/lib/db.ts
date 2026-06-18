@@ -1,3 +1,6 @@
+// Datenbank-Schicht: SQLite-Verbindung, Schema, Seed-Daten und alle SQL-Abfragen.
+// Wird beim ersten Zugriff initialisiert (Singleton über getDb).
+
 import Database from "better-sqlite3";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
@@ -8,6 +11,7 @@ import { AbsenceStatus, Role, type User } from "./types";
 
 let db: Database.Database | null = null;
 
+// Öffnet die DB einmalig; Pfad kommt aus DATABASE_PATH oder ./data/app.db
 function getDb() {
   if (!db) {
     const dbPath =
@@ -21,6 +25,7 @@ function getDb() {
   return db;
 }
 
+// Tabellen: User, Class, ClassStudent (n:m), Absence (pro Schüler/Klasse/Tag eindeutig)
 function initSchema() {
   const database = getDb();
   database.exec(`
@@ -55,6 +60,7 @@ function initSchema() {
   `);
 }
 
+// Demo-Daten nur wenn die DB leer ist: 1 Admin, 2 Lehrer, 10 Schüler, 2 Klassen
 function seedIfEmpty() {
   const database = getDb();
   const count = database.prepare("SELECT COUNT(*) as c FROM User").get() as {
@@ -311,6 +317,7 @@ export function getClassById(id: string) {
     .get(id) as { id: string; name: string; teacherId: string } | undefined;
 }
 
+// Lehrperson einer Klasse zuweisen oder ändern (Admin)
 export function updateClassTeacher(classId: string, teacherId: string) {
   getDb().prepare("UPDATE Class SET teacherId = ? WHERE id = ?").run(teacherId, classId);
   const cls = getClassById(classId)!;
@@ -323,6 +330,7 @@ export function updateClassTeacher(classId: string, teacherId: string) {
   };
 }
 
+// Prüft ob Schüler in der Klasse ist (Sicherheit bei Absenzen-Erfassung)
 export function isStudentInClass(classId: string, studentId: string) {
   const row = getDb()
     .prepare("SELECT 1 FROM ClassStudent WHERE classId = ? AND studentId = ?")
@@ -353,6 +361,7 @@ export function getTeacherClassCount(teacherId: string) {
   return row.c;
 }
 
+// Nur Klassen die dieser Lehrperson zugewiesen sind
 export function getTeacherClasses(teacherId: string) {
   return getDb()
     .prepare(
@@ -373,6 +382,7 @@ export function countOpenAbsences(teacherId: string) {
   return row.c;
 }
 
+// Klasse nur wenn teacherId übereinstimmt — verhindert Zugriff auf fremde Klassen
 export function getClassForTeacher(classId: string, teacherId: string, date?: Date) {
   const cls = getDb()
     .prepare("SELECT * FROM Class WHERE id = ? AND teacherId = ?")
@@ -414,6 +424,7 @@ export function getAbsenceForStudent(classId: string, studentId: string, date: D
     | undefined;
 }
 
+// Absenz anlegen oder aktualisieren (ein Eintrag pro Schüler/Klasse/Tag)
 export function upsertAbsence(data: {
   classId: string;
   studentId: string;
@@ -480,6 +491,7 @@ export function getStudentAbsences(studentId: string, limit = 30) {
   }[];
 }
 
+// Alle offenen und eingestuften Absenzen für die Admin-Übersicht
 export function getAdminAbsences() {
   return getDb()
     .prepare(
@@ -512,6 +524,7 @@ export function getAbsenceById(id: string) {
     | undefined;
 }
 
+// Admin stuft Absenz als EXCUSED (mit Grund in note) oder UNEXCUSED ein
 export function updateAbsenceByAdmin(id: string, status: string, note: string | null) {
   getDb().prepare("UPDATE Absence SET status = ?, note = ? WHERE id = ?").run(status, note, id);
   return getAbsenceById(id);

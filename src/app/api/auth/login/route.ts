@@ -1,3 +1,5 @@
+// POST /api/auth/login — E-Mail/Passwort prüfen, JWT-Session erstellen
+
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createSession } from "@/lib/auth";

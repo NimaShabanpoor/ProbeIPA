@@ -10,6 +10,7 @@ import {
 } from "@/lib/utils";
 import { AbsenceStatus, Role } from "@/lib/types";
 
+// Schüler-Dashboard: Zähler Entschuldigt/Unentschuldigt und Absenzen-Liste
 export default async function StudentDashboardPage() {
   const session = await requireRole(Role.STUDENT);
   if (!session) redirect("/");

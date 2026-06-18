@@ -1,5 +1,8 @@
 "use client";
 
+// Lehrer-UI: pro Schüler nur «Anwesend» / «Nicht anwesend».
+// Bereits vom Admin eingestufte Absenzen sind gesperrt.
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AbsenceStatus } from "@/lib/types";
@@ -23,6 +26,7 @@ function isPresent(status: string | undefined) {
 }
 
 function isClassifiedByAdmin(status: string | undefined) {
+  // EXCUSED oder UNEXCUSED = Admin hat eingestuft, Lehrer kann nicht mehr ändern
   return status === AbsenceStatus.EXCUSED || status === AbsenceStatus.UNEXCUSED;
 }
 

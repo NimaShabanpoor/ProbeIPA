@@ -1,3 +1,5 @@
+// Hilfsfunktionen für Datumsformatierung und Absenz-Labels in der UI.
+
 export function formatDate(date: Date | string) {
   return new Intl.DateTimeFormat("de-CH", {
     weekday: "short",
@@ -32,6 +34,7 @@ export function absenceReasonLabel(reason: string | null | undefined) {
   return reason ? labels[reason] ?? reason : "";
 }
 
+// Texte für die Schüler-Ansicht (vereinfacht gegenüber Admin-Labels)
 export function studentAbsenceLabel(status: string) {
   const labels: Record<string, string> = {
     ABSENT: "Noch nicht eingestuft",

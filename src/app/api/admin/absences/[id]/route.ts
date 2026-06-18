@@ -1,3 +1,5 @@
+// Admin-API: Absenz als entschuldigt oder unentschuldigt einstufen
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { getAbsenceById, updateAbsenceByAdmin } from "@/lib/db";
@@ -24,6 +26,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Ungültige Einstufung" }, { status: 400 });
   }
 
+  // Bei Entschuldigt ist ein Grund (Arztzeugnis/Termin) in note Pflicht
   if (classification === AbsenceStatus.EXCUSED) {
     const validReasons = Object.values(AbsenceReason);
     if (!reason || !validReasons.includes(reason)) {

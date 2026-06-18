@@ -13,6 +13,7 @@ const adminNav = [
   { href: "/admin/klassen", label: "Klassen" },
 ];
 
+// Admin: offene Absenzen prüfen und als entschuldigt/unentschuldigt einstufen
 export default async function AdminAbsencesPage() {
   const session = await requireRole(Role.ADMIN);
   if (!session) redirect("/");

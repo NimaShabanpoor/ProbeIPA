@@ -1,3 +1,5 @@
+// Lehrer-API: Anwesenheit erfassen (nur PRESENT/ABSENT, nur eigene Klassen)
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import {
@@ -29,6 +31,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   return NextResponse.json({ class: classData, date: date.toISOString() });
 }
 
+// Lehrer markiert Schüler als anwesend oder abwesend
 export async function POST(request: NextRequest, context: RouteContext) {
   const session = await requireRole(Role.TEACHER);
   if (!session) {
@@ -49,6 +52,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   }
 
   const existing = getAbsenceForStudent(id, studentId, absenceDate);
+  // Nach Admin-Einstufung darf Lehrer die Absenz nicht mehr ändern
   if (
     existing &&
     (existing.status === AbsenceStatus.EXCUSED || existing.status === AbsenceStatus.UNEXCUSED)
@@ -59,6 +63,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     );
   }
 
+  // Lehrer dürfen nur diese zwei Status setzen — kein Entschuldigen/Verspätet
   const validStatuses = [AbsenceStatus.PRESENT, AbsenceStatus.ABSENT];
   if (!validStatuses.includes(status)) {
     return NextResponse.json({ error: "Ungültiger Status" }, { status: 400 });

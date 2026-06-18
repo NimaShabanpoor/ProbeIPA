@@ -1,3 +1,6 @@
+// PATCH /api/admin/classes/[id] — Lehrperson einer Klasse zuweisen
+// DELETE — Klasse löschen
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
 import { deleteClass, getClassById, getUserById, updateClassTeacher } from "@/lib/db";

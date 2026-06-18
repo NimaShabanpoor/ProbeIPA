@@ -1,5 +1,7 @@
 "use client";
 
+// Admin-UI: Absenz als Entschuldigt (mit Dropdown-Grund) oder Unentschuldigt einstufen
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AbsenceReason, AbsenceStatus } from "@/lib/types";

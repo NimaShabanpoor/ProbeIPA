@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/auth";
 import { getTeacherClasses } from "@/lib/db";
 import { Role } from "@/lib/types";
 
+// Lehrer-Dashboard: zeigt nur Klassen die dieser Lehrperson zugewiesen sind
 export default async function TeacherDashboardPage() {
   const session = await requireRole(Role.TEACHER);
   if (!session) redirect("/");

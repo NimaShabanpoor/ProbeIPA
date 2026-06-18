@@ -1,3 +1,5 @@
+// Zentrale Typen und Konstanten für Rollen, Absenz-Status und Entschuldigungsgründe.
+
 export const Role = {
   ADMIN: "ADMIN",
   TEACHER: "TEACHER",
@@ -6,6 +8,7 @@ export const Role = {
 
 export type Role = (typeof Role)[keyof typeof Role];
 
+// Absenz-Workflow: Lehrer setzt PRESENT/ABSENT → Admin setzt EXCUSED/UNEXCUSED
 export const AbsenceStatus = {
   PRESENT: "PRESENT",
   ABSENT: "ABSENT",
@@ -17,6 +20,7 @@ export const AbsenceStatus = {
 
 export type AbsenceStatus = (typeof AbsenceStatus)[keyof typeof AbsenceStatus];
 
+// Grund bei «Entschuldigt» — wird in Absence.note gespeichert
 export const AbsenceReason = {
   ARZTZEUGNIS: "ARZTZEUGNIS",
   TERMIN: "TERMIN",

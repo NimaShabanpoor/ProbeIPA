@@ -12,6 +12,7 @@ type PageProps = {
   searchParams: Promise<{ date?: string }>;
 };
 
+// Klassen-Detail: Anwesenheit pro Schüler für ein gewähltes Datum erfassen
 export default async function ClassDetailPage({ params, searchParams }: PageProps) {
   const session = await requireRole(Role.TEACHER);
   if (!session) redirect("/");
@@ -23,6 +24,7 @@ export default async function ClassDetailPage({ params, searchParams }: PageProp
   date.setHours(0, 0, 0, 0);
 
   const classData = getClassForTeacher(id, session.id, date);
+  // Kein Zugriff wenn Klasse einem anderen Lehrer gehört
   if (!classData) redirect("/lehrer");
 
   const students = classData.students.map((entry) => ({

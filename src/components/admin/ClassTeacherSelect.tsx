@@ -1,5 +1,7 @@
 "use client";
 
+// Dropdown: Lehrperson einer bestehenden Klasse zuweisen oder ändern
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 

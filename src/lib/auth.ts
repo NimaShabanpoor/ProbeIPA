@@ -1,8 +1,19 @@
+// Authentifizierung: JWT-Session im httpOnly-Cookie, rollenbasierte Zugriffskontrolle.
+
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { Role } from "@/lib/types";
 
 export const SESSION_COOKIE = "absenzen-session";
+
+// JWT-Secret aus .env — ohne JWT_SECRET startet die App nicht
+function getSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET ist nicht gesetzt");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export interface SessionUser {
   id: string;
@@ -12,14 +23,7 @@ export interface SessionUser {
   role: Role;
 }
 
-function getSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET ist nicht gesetzt");
-  }
-  return new TextEncoder().encode(secret);
-}
-
+// Nach Login: JWT erzeugen und als Cookie setzen (7 Tage gültig)
 export async function createSession(user: SessionUser) {
   const token = await new SignJWT({
     id: user.id,
@@ -43,6 +47,7 @@ export async function createSession(user: SessionUser) {
   });
 }
 
+// Cookie auslesen und JWT prüfen; bei ungültigem Token null
 export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
@@ -67,6 +72,7 @@ export async function clearSession() {
   cookieStore.delete(SESSION_COOKIE);
 }
 
+// Gibt Session nur zurück wenn Rolle passt (ADMIN, TEACHER oder STUDENT)
 export async function requireRole(role: Role) {
   const session = await getSession();
   if (!session || session.role !== role) {
@@ -75,6 +81,7 @@ export async function requireRole(role: Role) {
   return session;
 }
 
+// Weiterleitung nach Login je nach Rolle
 export function dashboardForRole(role: Role) {
   if (role === Role.ADMIN) return "/admin";
   if (role === Role.TEACHER) return "/lehrer";

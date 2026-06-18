@@ -1,9 +1,12 @@
 "use client";
 
+// Login-Formular: ein Login für alle Rollen, Weiterleitung je nach Rolle
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Role } from "@/lib/types";
 
+// Ziel-Dashboard nach erfolgreichem Login
 const redirects: Record<Role, string> = {
   [Role.ADMIN]: "/admin",
   [Role.TEACHER]: "/lehrer",
