@@ -123,6 +123,7 @@ function seedIfEmpty() {
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.ABSENT, null, classAId, studentIds[0]);
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[1]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[2]);
+    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.UNEXCUSED, null, classAId, studentIds[3]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[5]);
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "ARZTZEUGNIS", classBId, studentIds[7]);
   })();
