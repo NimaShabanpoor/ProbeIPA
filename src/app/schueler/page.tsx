@@ -86,7 +86,9 @@ export default async function StudentDashboardPage() {
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${absenceStatusColor(absence.status)}`}
                       >
                         {absenceStatusLabel(absence.status)}
-                        {absence.note ? ` · ${absenceReasonLabel(absence.note)}` : ""}
+                        {absence.status === "EXCUSED" && absence.note
+                          ? ` · ${absenceReasonLabel(absence.note)}`
+                          : ""}
                       </span>
                     </td>
                   </tr>

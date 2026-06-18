@@ -116,8 +116,8 @@ function seedIfEmpty() {
     }
 
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.ABSENT, null, classAId, studentIds[0]);
-    insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, null, classAId, studentIds[1]);
-    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.UNEXCUSED, "VERSPAETET", classAId, studentIds[2]);
+    insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[1]);
+    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.EXCUSED, "VERSPAETET", classAId, studentIds[2]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[4]);
   })();
 }

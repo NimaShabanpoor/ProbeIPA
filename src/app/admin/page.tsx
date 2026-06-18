@@ -60,8 +60,9 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[
+            { href: "/admin/absenzen", title: "Absenzen prüfen", desc: "Abwesenheiten als entschuldigt oder unentschuldigt einstufen." },
             { href: "/admin/lehrer", title: "Lehrpersonen verwalten", desc: "Neue Lehrpersonen anlegen und Logins erstellen." },
             { href: "/admin/schueler", title: "Schüler verwalten", desc: "Schüler anlegen und Klassen zuweisen." },
             { href: "/admin/klassen", title: "Klassen verwalten", desc: "Klassen erstellen und Lehrpersonen zuweisen." },

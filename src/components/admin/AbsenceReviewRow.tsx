@@ -33,7 +33,9 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
         : "";
 
   const [classification, setClassification] = useState(initialClassification);
-  const [reason, setReason] = useState(absence.note ?? "");
+  const [reason, setReason] = useState(
+    absence.status === AbsenceStatus.EXCUSED ? absence.note ?? "" : ""
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,7 +47,7 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
       return;
     }
 
-    if (classification === AbsenceStatus.UNEXCUSED && !reason) {
+    if (classification === AbsenceStatus.EXCUSED && !reason) {
       setError("Bitte einen Grund auswählen.");
       return;
     }
@@ -56,7 +58,7 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         classification,
-        reason: classification === AbsenceStatus.UNEXCUSED ? reason : null,
+        reason: classification === AbsenceStatus.EXCUSED ? reason : null,
       }),
     });
 
@@ -90,10 +92,7 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => {
-              setClassification(AbsenceStatus.EXCUSED);
-              setReason("");
-            }}
+            onClick={() => setClassification(AbsenceStatus.EXCUSED)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
               classification === AbsenceStatus.EXCUSED
                 ? "bg-amber-600 text-white"
@@ -104,7 +103,10 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
           </button>
           <button
             type="button"
-            onClick={() => setClassification(AbsenceStatus.UNEXCUSED)}
+            onClick={() => {
+              setClassification(AbsenceStatus.UNEXCUSED);
+              setReason("");
+            }}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
               classification === AbsenceStatus.UNEXCUSED
                 ? "bg-red-600 text-white"
@@ -115,7 +117,7 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
           </button>
         </div>
 
-        {classification === AbsenceStatus.UNEXCUSED && (
+        {classification === AbsenceStatus.EXCUSED && (
           <select
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -134,7 +136,9 @@ export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {
         {!isPending && absence.status !== AbsenceStatus.ABSENT ? (
           <p className="mb-2 text-sm text-zinc-400">
             {absenceStatusLabel(absence.status)}
-            {absence.note ? ` · ${absenceReasonLabel(absence.note)}` : ""}
+            {absence.status === AbsenceStatus.EXCUSED && absence.note
+              ? ` · ${absenceReasonLabel(absence.note)}`
+              : ""}
           </p>
         ) : null}
         <button

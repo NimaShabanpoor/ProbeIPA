@@ -24,7 +24,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Ungültige Einstufung" }, { status: 400 });
   }
 
-  if (classification === AbsenceStatus.UNEXCUSED) {
+  if (classification === AbsenceStatus.EXCUSED) {
     const validReasons = Object.values(AbsenceReason);
     if (!reason || !validReasons.includes(reason)) {
       return NextResponse.json({ error: "Bitte einen gültigen Grund wählen" }, { status: 400 });
@@ -34,7 +34,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const updated = updateAbsenceByAdmin(
     id,
     classification,
-    classification === AbsenceStatus.UNEXCUSED ? reason : null
+    classification === AbsenceStatus.EXCUSED ? reason : null
   );
 
   return NextResponse.json({ absence: updated });
