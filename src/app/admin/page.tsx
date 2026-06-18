@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
             { href: "/admin/absenzen", title: "Absenzen prüfen", desc: "Abwesenheiten als entschuldigt oder unentschuldigt einstufen." },
             { href: "/admin/lehrer", title: "Lehrpersonen verwalten", desc: "Neue Lehrpersonen anlegen und Logins erstellen." },
             { href: "/admin/schueler", title: "Schüler verwalten", desc: "Schüler anlegen und Klassen zuweisen." },
-            { href: "/admin/klassen", title: "Klassen verwalten", desc: "Klassen erstellen und Lehrpersonen zuweisen." },
+            { href: "/admin/klassen", title: "Klassen verwalten", desc: "Klassen erstellen, Lehrpersonen zuweisen und Schüler einteilen." },
           ].map((item) => (
             <Link
               key={item.href}

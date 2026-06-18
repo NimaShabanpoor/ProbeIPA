@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { CreateClassForm } from "@/components/admin/CreateClassForm";
 import { AssignStudentForm } from "@/components/admin/AssignStudentForm";
 import { ClassStudentList } from "@/components/admin/ClassStudentList";
+import { ClassTeacherSelect } from "@/components/admin/ClassTeacherSelect";
 import { DeleteClassButton } from "@/components/admin/DeleteClassButton";
 import { requireRole } from "@/lib/auth";
 import { getClassesWithStudents, getTeachers, getStudents } from "@/lib/db";
@@ -20,7 +21,7 @@ export default async function AdminClassesPage() {
     <div className="min-h-screen bg-zinc-950">
       <Header
         title="Klassenverwaltung"
-        subtitle="Klassen erstellen und Schüler zuweisen"
+        subtitle="Klassen erstellen, Lehrpersonen zuweisen und Schüler verwalten"
         userName={`${session.firstName} ${session.lastName}`}
         nav={[
           { href: "/admin", label: "Übersicht" },
@@ -48,13 +49,15 @@ export default async function AdminClassesPage() {
 
               return (
                 <div key={cls.id} className="rounded-xl border border-zinc-700 bg-zinc-900 p-6">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-zinc-100">{cls.name}</h3>
-                      <p className="text-sm text-zinc-500">
-                        Lehrperson: {cls.teacher.lastName} {cls.teacher.firstName} ·{" "}
-                        {cls._count.students} Schüler
-                      </p>
+                      <ClassTeacherSelect
+                        classId={cls.id}
+                        teachers={teachers}
+                        currentTeacherId={cls.teacher.id}
+                      />
+                      <p className="text-sm text-zinc-500">{cls._count.students} Schüler</p>
                     </div>
                     <DeleteClassButton classId={cls.id} className={cls.name} />
                   </div>

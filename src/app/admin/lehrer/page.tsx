@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { CreateTeacherForm } from "@/components/admin/CreateTeacherForm";
 import { UserActions } from "@/components/admin/UserActions";
 import { requireRole } from "@/lib/auth";
-import { getTeachers } from "@/lib/db";
+import { getTeachers, getClasses } from "@/lib/db";
 import { Role } from "@/lib/types";
 
 export default async function AdminTeachersPage() {
@@ -11,12 +11,13 @@ export default async function AdminTeachersPage() {
   if (!session) redirect("/");
 
   const teachers = getTeachers();
+  const classes = getClasses();
 
   return (
     <div className="min-h-screen bg-zinc-950">
       <Header
         title="Lehrpersonen"
-        subtitle="Lehrpersonen anlegen, bearbeiten und löschen"
+        subtitle="Lehrpersonen anlegen und Klassen zuweisen"
         userName={`${session.firstName} ${session.lastName}`}
         nav={[
           { href: "/admin", label: "Übersicht" },
@@ -60,7 +61,12 @@ export default async function AdminTeachersPage() {
                       {teacher.lastName} {teacher.firstName}
                     </td>
                     <td className="px-6 py-4 text-zinc-400">{teacher.email}</td>
-                    <td className="px-6 py-4 text-zinc-400">{teacher.classCount}</td>
+                    <td className="px-6 py-4 text-zinc-400">
+                      {classes
+                        .filter((cls) => cls.teacherId === teacher.id)
+                        .map((cls) => cls.name)
+                        .join(", ") || "—"}
+                    </td>
                     <td className="px-6 py-4">
                       <UserActions
                         id={teacher.id}

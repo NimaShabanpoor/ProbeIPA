@@ -66,7 +66,7 @@ function seedIfEmpty() {
   const adminId = randomUUID();
   const teacher1Id = randomUUID();
   const teacher2Id = randomUUID();
-  const studentIds = Array.from({ length: 5 }, () => randomUUID());
+  const studentIds = Array.from({ length: 10 }, () => randomUUID());
   const classAId = randomUUID();
   const classBId = randomUUID();
 
@@ -100,6 +100,11 @@ function seedIfEmpty() {
       { id: studentIds[2], firstName: "Noah", lastName: "Brunner", email: "noah@schule.ch" },
       { id: studentIds[3], firstName: "Emma", lastName: "Fischer", email: "emma@schule.ch" },
       { id: studentIds[4], firstName: "Lea", lastName: "Widmer", email: "lea@schule.ch" },
+      { id: studentIds[5], firstName: "Tim", lastName: "Stein", email: "tim@schule.ch" },
+      { id: studentIds[6], firstName: "Mia", lastName: "Huber", email: "mia@schule.ch" },
+      { id: studentIds[7], firstName: "Jan", lastName: "Roth", email: "jan@schule.ch" },
+      { id: studentIds[8], firstName: "Lina", lastName: "Vogel", email: "lina@schule.ch" },
+      { id: studentIds[9], firstName: "Elias", lastName: "Zürcher", email: "elias@schule.ch" },
     ];
     for (const s of students) {
       insertUser.run(s.id, s.email, password, s.firstName, s.lastName, Role.STUDENT);
@@ -108,17 +113,18 @@ function seedIfEmpty() {
     insertClass.run(classAId, "3a Mathematik", teacher1Id);
     insertClass.run(classBId, "3b Deutsch", teacher2Id);
 
-    for (const sid of studentIds.slice(0, 3)) {
+    for (const sid of studentIds.slice(0, 5)) {
       insertMember.run(randomUUID(), classAId, sid);
     }
-    for (const sid of studentIds.slice(2, 5)) {
+    for (const sid of studentIds.slice(5, 10)) {
       insertMember.run(randomUUID(), classBId, sid);
     }
 
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.ABSENT, null, classAId, studentIds[0]);
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[1]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.EXCUSED, "VERSPAETET", classAId, studentIds[2]);
-    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[4]);
+    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[5]);
+    insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "ARZTZEUGNIS", classBId, studentIds[7]);
   })();
 }
 
@@ -296,6 +302,31 @@ export function createClass(name: string, teacherId: string) {
   getDb().prepare("INSERT INTO Class (id, name, teacherId) VALUES (?, ?, ?)").run(id, name, teacherId);
   const teacher = getUserById(teacherId, Role.TEACHER)!;
   return { id, name, teacherId, teacher: { id: teacher.id, firstName: teacher.firstName, lastName: teacher.lastName } };
+}
+
+export function getClassById(id: string) {
+  return getDb()
+    .prepare("SELECT * FROM Class WHERE id = ?")
+    .get(id) as { id: string; name: string; teacherId: string } | undefined;
+}
+
+export function updateClassTeacher(classId: string, teacherId: string) {
+  getDb().prepare("UPDATE Class SET teacherId = ? WHERE id = ?").run(teacherId, classId);
+  const cls = getClassById(classId)!;
+  const teacher = getUserById(teacherId, Role.TEACHER)!;
+  return {
+    id: cls.id,
+    name: cls.name,
+    teacherId: teacher.id,
+    teacher: { id: teacher.id, firstName: teacher.firstName, lastName: teacher.lastName },
+  };
+}
+
+export function isStudentInClass(classId: string, studentId: string) {
+  const row = getDb()
+    .prepare("SELECT 1 FROM ClassStudent WHERE classId = ? AND studentId = ?")
+    .get(classId, studentId);
+  return !!row;
 }
 
 export function deleteClass(id: string) {

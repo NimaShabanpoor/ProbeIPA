@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
-import { getClassForTeacher, upsertAbsence } from "@/lib/db";
+import { getClassForTeacher, isStudentInClass, upsertAbsence } from "@/lib/db";
 import { AbsenceStatus, Role } from "@/lib/types";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -35,6 +35,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   if (!getClassForTeacher(id, session.id)) {
     return NextResponse.json({ error: "Klasse nicht gefunden" }, { status: 404 });
+  }
+
+  if (!isStudentInClass(id, studentId)) {
+    return NextResponse.json({ error: "Schüler gehört nicht zu dieser Klasse" }, { status: 400 });
   }
 
   const validStatuses = [AbsenceStatus.PRESENT, AbsenceStatus.ABSENT];
