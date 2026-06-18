@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth";
-import { getClassForTeacher, isStudentInClass, upsertAbsence } from "@/lib/db";
+import {
+  getAbsenceForStudent,
+  getClassForTeacher,
+  isStudentInClass,
+  upsertAbsence,
+} from "@/lib/db";
 import { AbsenceStatus, Role } from "@/lib/types";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -32,6 +37,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   const { id } = await context.params;
   const { studentId, date, status, note } = await request.json();
+  const absenceDate = new Date(date);
+  absenceDate.setHours(0, 0, 0, 0);
 
   if (!getClassForTeacher(id, session.id)) {
     return NextResponse.json({ error: "Klasse nicht gefunden" }, { status: 404 });
@@ -39,6 +46,17 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   if (!isStudentInClass(id, studentId)) {
     return NextResponse.json({ error: "Schüler gehört nicht zu dieser Klasse" }, { status: 400 });
+  }
+
+  const existing = getAbsenceForStudent(id, studentId, absenceDate);
+  if (
+    existing &&
+    (existing.status === AbsenceStatus.EXCUSED || existing.status === AbsenceStatus.UNEXCUSED)
+  ) {
+    return NextResponse.json(
+      { error: "Diese Absenz wurde bereits vom Admin eingestuft" },
+      { status: 403 }
+    );
   }
 
   const validStatuses = [AbsenceStatus.PRESENT, AbsenceStatus.ABSENT];
@@ -49,7 +67,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const absence = upsertAbsence({
     classId: id,
     studentId,
-    date: new Date(date),
+    date: absenceDate,
     status,
     note: note?.trim() || null,
   });

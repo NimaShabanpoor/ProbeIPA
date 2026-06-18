@@ -20,7 +20,6 @@ export type AbsenceStatus = (typeof AbsenceStatus)[keyof typeof AbsenceStatus];
 export const AbsenceReason = {
   ARZTZEUGNIS: "ARZTZEUGNIS",
   TERMIN: "TERMIN",
-  VERSPAETET: "VERSPAETET",
 } as const;
 
 export type AbsenceReason = (typeof AbsenceReason)[keyof typeof AbsenceReason];

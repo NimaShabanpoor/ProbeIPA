@@ -20,7 +20,6 @@ interface AbsenceReviewRowProps {
 const reasonOptions = [
   { value: AbsenceReason.ARZTZEUGNIS, label: "Arztzeugnis" },
   { value: AbsenceReason.TERMIN, label: "Termin" },
-  { value: AbsenceReason.VERSPAETET, label: "Verspätet" },
 ] as const;
 
 export function AbsenceReviewRow({ absence }: AbsenceReviewRowProps) {

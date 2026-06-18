@@ -40,7 +40,7 @@ export default async function AdminAbsencesPage() {
           <div className="border-b border-zinc-700 px-6 py-4">
             <h2 className="text-lg font-semibold text-zinc-100">Alle Abwesenheiten</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Von Lehrpersonen als «Nicht anwesend» erfasst — hier als entschuldigt oder unentschuldigt einstufen.
+              Von Lehrpersonen als «Nicht anwesend» erfasst — hier als entschuldigt oder unentschuldigt einstufen (nur Admin).
             </p>
           </div>
           <table className="min-w-full divide-y divide-zinc-700">

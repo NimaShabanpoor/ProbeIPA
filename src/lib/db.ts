@@ -122,7 +122,7 @@ function seedIfEmpty() {
 
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.ABSENT, null, classAId, studentIds[0]);
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[1]);
-    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.EXCUSED, "VERSPAETET", classAId, studentIds[2]);
+    insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.EXCUSED, "TERMIN", classAId, studentIds[2]);
     insertAbsence.run(randomUUID(), fmt(today), AbsenceStatus.ABSENT, null, classBId, studentIds[5]);
     insertAbsence.run(randomUUID(), fmt(yesterday), AbsenceStatus.EXCUSED, "ARZTZEUGNIS", classBId, studentIds[7]);
   })();
@@ -402,6 +402,15 @@ export function getClassForTeacher(classId: string, teacherId: string, date?: Da
       },
     })),
   };
+}
+
+export function getAbsenceForStudent(classId: string, studentId: string, date: Date) {
+  const dateStr = toDateString(date);
+  return getDb()
+    .prepare("SELECT id, status, note FROM Absence WHERE classId = ? AND studentId = ? AND date = ?")
+    .get(classId, studentId, dateStr) as
+    | { id: string; status: string; note: string | null }
+    | undefined;
 }
 
 export function upsertAbsence(data: {
