@@ -32,6 +32,15 @@ export function absenceReasonLabel(reason: string | null | undefined) {
   return reason ? labels[reason] ?? reason : "";
 }
 
+export function studentAbsenceLabel(status: string) {
+  const labels: Record<string, string> = {
+    ABSENT: "Noch nicht eingestuft",
+    EXCUSED: "Entschuldigt",
+    UNEXCUSED: "Unentschuldigt",
+  };
+  return labels[status] ?? absenceStatusLabel(status);
+}
+
 export function absenceStatusColor(status: string) {
   const colors: Record<string, string> = {
     PRESENT: "bg-emerald-900/50 text-emerald-300 border border-emerald-800",

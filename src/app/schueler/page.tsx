@@ -2,8 +2,13 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { requireRole } from "@/lib/auth";
 import { getStudentMemberships, getStudentAbsences, getStudentAbsenceStats } from "@/lib/db";
-import { absenceStatusColor, absenceStatusLabel, absenceReasonLabel, formatDate } from "@/lib/utils";
-import { Role } from "@/lib/types";
+import {
+  absenceReasonLabel,
+  absenceStatusColor,
+  formatDate,
+  studentAbsenceLabel,
+} from "@/lib/utils";
+import { AbsenceStatus, Role } from "@/lib/types";
 
 export default async function StudentDashboardPage() {
   const session = await requireRole(Role.STUDENT);
@@ -12,30 +17,34 @@ export default async function StudentDashboardPage() {
   const memberships = getStudentMemberships(session.id);
   const absences = getStudentAbsences(session.id);
   const stats = getStudentAbsenceStats(session.id);
-
   const statMap = Object.fromEntries(stats.map((s) => [s.status, s.count]));
+
+  const excusedCount = statMap[AbsenceStatus.EXCUSED] ?? 0;
+  const unexcusedCount = statMap[AbsenceStatus.UNEXCUSED] ?? 0;
 
   return (
     <div className="min-h-screen bg-zinc-950">
       <Header
-        title="Mein Absenzen-Überblick"
-        subtitle="Ihre Klassen und Absenzen auf einen Blick"
+        title="Meine Absenzen"
+        subtitle="Übersicht Ihrer Abwesenheiten"
         userName={`${session.firstName} ${session.lastName}`}
       />
 
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
-        <section className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
-            <p className="text-sm text-zinc-500">Abwesend</p>
-            <p className="mt-1 text-3xl font-bold text-red-400">{statMap.ABSENT ?? 0}</p>
-          </div>
+        <section className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
             <p className="text-sm text-zinc-500">Entschuldigt</p>
-            <p className="mt-1 text-3xl font-bold text-amber-400">{statMap.EXCUSED ?? 0}</p>
+            <p className="mt-1 text-3xl font-bold text-amber-400">{excusedCount}</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {excusedCount === 1 ? "Absenz" : "Absenzen"}
+            </p>
           </div>
           <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-5">
             <p className="text-sm text-zinc-500">Unentschuldigt</p>
-            <p className="mt-1 text-3xl font-bold text-red-400">{statMap.UNEXCUSED ?? 0}</p>
+            <p className="mt-1 text-3xl font-bold text-red-400">{unexcusedCount}</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {unexcusedCount === 1 ? "Absenz" : "Absenzen"}
+            </p>
           </div>
         </section>
 
@@ -59,20 +68,32 @@ export default async function StudentDashboardPage() {
 
         <section className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
           <div className="border-b border-zinc-700 px-6 py-4">
-            <h2 className="text-lg font-semibold text-zinc-100">Meine Absenzen</h2>
+            <h2 className="text-lg font-semibold text-zinc-100">Alle Absenzen</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Hier sehen Sie, ob eine Absenz entschuldigt oder unentschuldigt ist.
+            </p>
           </div>
           <table className="min-w-full divide-y divide-zinc-700">
             <thead className="bg-zinc-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Datum</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Klasse</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">
+                  Datum
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">
+                  Klasse
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">
+                  Einstufung
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase text-zinc-500">
+                  Grund
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
               {absences.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-8 text-center text-zinc-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-zinc-500">
                     Keine Absenzen erfasst. Gut gemacht!
                   </td>
                 </tr>
@@ -85,11 +106,13 @@ export default async function StudentDashboardPage() {
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${absenceStatusColor(absence.status)}`}
                       >
-                        {absenceStatusLabel(absence.status)}
-                        {absence.status === "EXCUSED" && absence.note
-                          ? ` · ${absenceReasonLabel(absence.note)}`
-                          : ""}
+                        {studentAbsenceLabel(absence.status)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-zinc-400">
+                      {absence.status === AbsenceStatus.EXCUSED && absence.note
+                        ? absenceReasonLabel(absence.note)
+                        : "—"}
                     </td>
                   </tr>
                 ))
