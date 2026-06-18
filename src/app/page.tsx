@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/LoginForm";
 import { dashboardForRole, getSession } from "@/lib/auth";
+import { DEMO_PASSWORD } from "@/lib/demo";
 export default async function HomePage() {
   const session = await getSession();
   if (session) redirect(dashboardForRole(session.role));
@@ -25,7 +26,7 @@ export default async function HomePage() {
         </div>
 
         <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-xs text-zinc-500">
-          <p className="mb-2 font-medium text-zinc-400">Demo-Zugänge (Passwort: demo123)</p>
+          <p className="mb-2 font-medium text-zinc-400">Demo-Zugänge (Passwort: {DEMO_PASSWORD})</p>
           <p>Admin: admin@schule.ch</p>
           <p>Lehrer: mueller@schule.ch</p>
           <p>Schüler: lukas@schule.ch</p>

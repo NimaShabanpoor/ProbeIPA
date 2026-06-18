@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { DemoLoginsPanel } from "@/components/admin/DemoLoginsPanel";
 import { Header } from "@/components/Header";
 import { requireRole } from "@/lib/auth";
-import { countUsersByRole, countClasses } from "@/lib/db";
+import { countUsersByRole, countClasses, getClasses, getStudents, getTeachers } from "@/lib/db";
 import { Role } from "@/lib/types";
 
 export default async function AdminDashboardPage() {
@@ -12,6 +13,21 @@ export default async function AdminDashboardPage() {
   const teacherCount = countUsersByRole(Role.TEACHER);
   const studentCount = countUsersByRole(Role.STUDENT);
   const classCount = countClasses();
+  const classes = getClasses();
+  const teachers = getTeachers().map((teacher) => ({
+    firstName: teacher.firstName,
+    lastName: teacher.lastName,
+    email: teacher.email,
+    classes: classes
+      .filter((cls) => cls.teacherId === teacher.id)
+      .map((cls) => cls.name),
+  }));
+  const students = getStudents().map((student) => ({
+    firstName: student.firstName,
+    lastName: student.lastName,
+    email: student.email,
+    classes: student.classMemberships.map((membership) => membership.class.name),
+  }));
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -59,6 +75,8 @@ export default async function AdminDashboardPage() {
             </Link>
           ))}
         </section>
+
+        <DemoLoginsPanel teachers={teachers} students={students} />
       </main>
     </div>
   );

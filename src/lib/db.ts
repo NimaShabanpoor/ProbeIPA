@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
+import { DEMO_PASSWORD } from "./demo";
 import { AbsenceStatus, Role, type User } from "./types";
 
 let db: Database.Database | null = null;
@@ -61,7 +62,7 @@ function seedIfEmpty() {
   };
   if (count.c > 0) return;
 
-  const password = bcrypt.hashSync("demo123", 10);
+  const password = bcrypt.hashSync(DEMO_PASSWORD, 10);
   const adminId = randomUUID();
   const teacher1Id = randomUUID();
   const teacher2Id = randomUUID();
